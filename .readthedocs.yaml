@@ -4,18 +4,9 @@ build:
   os: "ubuntu-22.04"
   tools:
     python: "3.12"
-  apt_packages:
-    - libcairo2-dev
-    - libpango1.0-dev
-    - libjpeg-dev
-    - libgirepository1.0-dev
   commands:
     - pip install -r requirements.txt
-    - mkdocs build --strict --verbose
-
-mkdocs:
-  configuration: mkdocs.yml
-  fail_on_warning: true
+    - mkdocs build --strict -d $READTHEDOCS_OUTPUT/html
 
 python:
   install:
@@ -23,5 +14,3 @@ python:
 
 formats:
   - htmlzip
-  - pdf
-  - epub

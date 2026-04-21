@@ -1,5 +1,6 @@
 site_name: MEDHIRA JSON UI Engine
 site_url: https://medhira-rn-expo-json-ui-engine.readthedocs.io
+docs_dir: docs
 site_description: A JSON-driven UI engine for React Native and Expo - Engineering Intelligence Across Everything
 site_author: MEDHIRA Team
 
