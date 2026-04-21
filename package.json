@@ -1,6 +1,6 @@
 {
   "name": "medhira-rn-expo-json-ui-engine",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A JSON-driven UI engine for React Native and Expo that enables dynamic, runtime-rendered interfaces without rebuilding the app. Powered by MEDHIRA - Engineering Intelligence Across Everything.",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
