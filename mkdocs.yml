@@ -25,7 +25,7 @@ theme:
         icon: material/weather-sunny
         name: Switch to light mode
   logo: https://raw.githubusercontent.com/HELLOMEDHIRA/medhira/main/assets/medhira-logo.png
-  favicon: https://raw.githubusercontent.com/HELLOMEDHIRA/medhira/blob/main/assets/medhira-logo.png
+  favicon: https://raw.githubusercontent.com/HELLOMEDHIRA/medhira/main/assets/medhira-logo.png
   features:
     - navigation.top
     - navigation.tracking
