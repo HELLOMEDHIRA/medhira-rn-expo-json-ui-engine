@@ -60,7 +60,7 @@ export default function App() {
 
 To keep this library maintained and up-to-date, please consider sponsoring it on GitHub.
 
-Or, if you're looking for private support or help in customizing the experience, reach out to us at **hello@medhira.io**
+Or, if you're looking for private support or help in customizing the experience, reach out to us at **hello.medhira@gmail.com**
 
 ---
 
