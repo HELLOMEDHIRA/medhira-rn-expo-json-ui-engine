@@ -182,6 +182,6 @@ Apache-2.0 © MEDHIRA
 
 * GitHub: [HELLOMEDHIRA/medhira-rn-expo-json-ui-engine](https://github.com/HELLOMEDHIRA/medhira-rn-expo-json-ui-engine)
 * Issues: [Report bugs here](https://github.com/HELLOMEDHIRA/medhira-rn-expo-json-ui-engine/issues)
-* Website: [https://medhira.io](https://medhira.io)
+* Website: [https://medhira.readthedocs.io/en/latest/](https://medhira.readthedocs.io/en/latest/)
 
 ---

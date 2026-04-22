@@ -6,7 +6,7 @@
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
   "types": "./lib/typescript/commonjs/index.d.ts",
-  "logo": "https://github.com/HELLOMEDHIRA/medhira/blob/main/assets/medhira-logo.png",
+  "logo": "https://raw.githubusercontent.com/HELLOMEDHIRA/medhira/main/assets/medhira-logo.png",
   "files": [
     "lib",
     "android",
@@ -60,7 +60,7 @@
   "contributors": [
     "MEDHIRA Team"
   ],
-  "author": "MEDHIRA <hello.medhira@gmail.com> (https://medhira.io)",
+  "author": "MEDHIRA <hello.medhira@gmail.com> (https://medhira.readthedocs.io/en/latest/)",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/HELLOMEDHIRA/medhira-rn-expo-json-ui-engine/issues"
