@@ -1,7 +1,5 @@
 # medhira-rn-expo-json-ui-engine
 
-<!-- Keywords: react-native, expo, json-ui, runtime-ui, dynamic-ui, no-code, low-code, mobile-ui-engine, json-renderer, react-native-json, ui-from-json, component-registry, observable-ui, typescript-ui, rxjs-ui, medhira -->
-
 <p align="center">
   <img src="https://raw.githubusercontent.com/HELLOMEDHIRA/medhira/main/assets/medhira-logo.png" alt="MEDHIRA Logo" width="200"/>
 </p>
@@ -10,40 +8,45 @@
   <strong>Engineering Intelligence Across Everything</strong>
 </p>
 
----
+<p align="center">
+  <a href="https://www.npmjs.com/package/medhira-rn-expo-json-ui-engine"><img src="https://img.shields.io/npm/v/medhira-rn-expo-json-ui-engine.svg" alt="npm version"/></a>
+  <a href="https://github.com/HELLOMEDHIRA/medhira-rn-expo-json-ui-engine/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"/></a>
+  <a href="https://expo.dev/changelog/sdk-56"><img src="https://img.shields.io/badge/Expo%20SDK-56-000020.svg?logo=expo" alt="Expo SDK 56"/></a>
+</p>
 
-A JSON-driven UI engine for React Native and Expo that enables dynamic, runtime-rendered interfaces without rebuilding the app.
+A **JSON-driven UI engine** for **React Native + Expo** that renders screens at runtime from JSON — ideal for backend-driven apps, chatbot layouts, and low-code platforms.
 
-> **Note:** This package is designed specifically for **Expo React Native projects only**, and requires **Expo SDK version 52 or higher**. It may not work in pure React Native (non-Expo) setups.
-
----
-
-## Why This Package Matters
-
-In today's mobile app landscape, many applications—especially those powered by chatbots or backend-driven platforms—require the flexibility to render UIs dynamically from a backend source. This package enables exactly that:
-
-* Ideal for **backend-driven UIs** or **chatbot-driven layouts**.
-* Dynamically render components via JSON without code changes or app rebuilds.
-* Built with **performance in mind** — styles are automatically cached and reused project-wide, reducing memory and rendering overhead.
-* Smart layout strategies and optimization handled internally — you don't have to manage performance concerns manually.
-
-This makes it a great choice for low-code platforms, headless CMS integrations, and any app that prioritizes flexibility and performance.
+> **Requires Expo SDK 56+** and the React Native New Architecture.
 
 ---
 
-## Features
+## Why MEDHIRA?
 
-* Render UI directly from JSON
-* Reusable component registry via `useComponent`
-* Runtime support for:
+| Benefit | Description |
+|--------|-------------|
+| **Backend-driven UI** | Ship layouts from API/CMS without app store releases |
+| **Runtime rendering** | Static JSON, sync/async functions, or observables |
+| **Performance** | Style caching via [`medhira-rn-styles-cache`](https://www.npmjs.com/package/medhira-rn-styles-cache) |
+| **Extensible** | Reusable registry with `defineUseComponent` |
+| **Type-safe** | Full TypeScript definitions |
 
-  * Static JSON
-  * Function-based sources
-  * RxJS-like observables
-* Built-in support for popular native/Expo components
-* Support for conditional visibility with `showIf`
-* Style optimization with `smh-rn-styles-cache`
-* Full TypeScript support
+```mermaid
+flowchart LR
+  JSON[JSON / API] --> JSONUI[JSONUI]
+  JSONUI --> RN[Expo / React Native UI]
+  REG[Component registry] --> JSONUI
+```
+
+---
+
+## Compatibility
+
+| Requirement | Version |
+|-------------|---------|
+| Expo SDK | **56+** |
+| React Native | **0.85+** |
+| React | **19+** |
+| Node.js | **20+** |
 
 ---
 
@@ -55,133 +58,102 @@ npm install medhira-rn-expo-json-ui-engine
 yarn add medhira-rn-expo-json-ui-engine
 ```
 
-> Make sure to install peer dependencies (React Native, Expo, etc.) if not already present.
+### Peer dependencies
+
+```bash
+npx expo install expo react react-native react-native-gesture-handler react-native-reanimated react-native-worklets react-native-pager-view
+```
+
+### Expo modules (install what you use)
+
+```bash
+npx expo install expo-image expo-camera expo-video expo-blur expo-linear-gradient \
+  expo-checkbox expo-status-bar expo-gl expo-live-photo
+```
 
 ---
 
-## Basic Usage
+## Quick start
 
 ```tsx
 import { JSONUI } from 'medhira-rn-expo-json-ui-engine';
 
-const json = {
+const ui = {
   type: 'Text',
   value: 'Hello JSON UI',
-  props: {
-    style: { fontSize: 24 }
-  }
+  props: { style: { fontSize: 24 } },
 };
 
 export default function App() {
-  return <JSONUI json={json} />;
+  return <JSONUI json={ui} />;
 }
 ```
 
----
-
-## Dynamic Source
+### Dynamic source (including async)
 
 ```tsx
-<JSONUI jsonSource={() => fetchMyJson()} />
+<JSONUI jsonSource={async () => fetchUiFromApi()} />
+```
+
+### Context + conditional UI
+
+```tsx
+<JSONUI
+  json={menu}
+  context={{ user: { role: 'admin' } }}
+/>
 ```
 
 ```tsx
-<JSONUI jsonSource={myObservable$} />
+// TypeScript / TSX JSON objects:
+showIf: (ctx) => ctx.user?.role === 'admin',
 ```
 
----
-
-## Component Registry
+### Reusable components
 
 ```tsx
-import { defineUseComponent } from 'medhira-rn-expo-json-ui-engine';
+import { defineUseComponent, JSONUI } from 'medhira-rn-expo-json-ui-engine';
 
-const MyCard = defineUseComponent(
-  'MyCard',
-  { title: 'Title', subtitle: 'Sub' },
-  {
-    type: 'ViewContainer',
-    wrapperComponent: 'View',
-    props: { style: { padding: 10 } },
-    properties: [
-      { type: 'Text', value: '{{title}}' },
-      { type: 'Text', value: '{{subtitle}}' }
-    ]
-  }
-);
+const Card = defineUseComponent('Card', { title: 'Title' }, {
+  type: 'ViewContainer',
+  wrapperComponent: 'View',
+  properties: [{ type: 'Text', value: '{{title}}' }],
+});
 
-<JSONUI json={MyCard} />;
+<JSONUI json={{ type: 'useComponent', ref: 'Card', props: { title: 'Hi' } }} />;
 ```
 
 ---
 
-## Supported Components
+## Features
 
-### Containers:
-
-* `ViewContainer`: Renders multiple nested components with optional layout.
-
-  * Uses configurable `Wrapper` components like `View`, `TouchableWithoutFeedback`, etc.
-* `ListContainer`: Standard list with item rendering and custom header/footer support.
-* `ViewListContainer`: FlashList + wrapper + sticky headers; high-perf for dynamic lists.
-
-### Basic Components:
-
-* `Text`, `TextInput`, `Button`, `Image`, `ImageBackground`
-* `Slider`, `Checkbox`, `DateTimePicker`, `StatusBar`
-* `LottieView`, `GLView`, `CameraView`, `VideoView`
-* `FlashList`, `LinearGradient`, `MaskedView`, `PagerView`
+- Render UI from JSON, arrays, functions, Promises, or observables
+- `defineUseComponent` registry with `{{placeholder}}` strings
+- `showIf` boolean or context-aware functions
+- Built-in Expo / RN components (Text, Image, FlashList, Camera, Lottie, Carousel, **PagerView**, …)
+- `JSONUIErrorBoundary` for production safety
+- Apache-2.0 licensed
 
 ---
 
-## Conditional Rendering
+## Documentation
 
-```json
-{
-  "type": "Text",
-  "value": "Only if admin",
-  "showIf": "context.user?.isAdmin"
-}
+- [Full docs](https://medhira-rn-expo-json-ui-engine.readthedocs.io) (MkDocs)
+- [Contributing](./CONTRIBUTING.md)
+- [Changelog](./CHANGELOG.md)
+- [Security](./SECURITY.md)
+
+---
+
+## Example app
+
+```bash
+yarn install
+yarn example
 ```
-
-> Supports boolean expressions or functions.
-
----
-
-## Contributing
-
-Contributions are always welcome, no matter how large or small!
-
-We want this community to be friendly and respectful to each other. Please follow this in all your interactions with the project.
-
-Please feel free to reach out to the MEDHIRA team — hello.medhira@gmail.com
-
----
-
-## Keywords
-
-react-native, expo, json-ui, runtime-ui, dynamic-ui, no-code, low-code, mobile-ui-engine, json-renderer, react-native-json, ui-from-json, component-registry, observable-ui, typescript-ui, rxjs-ui, backend-driven-ui, chatbot-ui-engine, expo-sdk-52+, medhira
-
----
-
-## Sponsor & Support
-
-To keep this library maintained and up-to-date, please consider sponsoring it on GitHub.
-
-Or, if you're looking for private support or help in customizing the experience, reach out to us at hello.medhira@gmail.com
 
 ---
 
 ## License
 
-Apache-2.0 © MEDHIRA
-
----
-
-## Links
-
-* GitHub: [HELLOMEDHIRA/medhira-rn-expo-json-ui-engine](https://github.com/HELLOMEDHIRA/medhira-rn-expo-json-ui-engine)
-* Issues: [Report bugs here](https://github.com/HELLOMEDHIRA/medhira-rn-expo-json-ui-engine/issues)
-* Website: [https://medhira.readthedocs.io/en/latest/](https://medhira.readthedocs.io/en/latest/)
-
----
+Apache-2.0 © MEDHIRA — see [LICENSE](./LICENSE) and [NOTICE](./NOTICE).

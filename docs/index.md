@@ -8,37 +8,40 @@ title: MEDHIRA JSON UI Engine
   <img src="https://raw.githubusercontent.com/HELLOMEDHIRA/medhira/main/assets/medhira-logo.png" alt="MEDHIRA Logo" width="150"/>
 </p>
 
-<p align="center">
-  <strong>Engineering Intelligence Across Everything</strong>
-</p>
-
----
-
-A JSON-driven UI engine for React Native and Expo that enables dynamic, runtime-rendered interfaces without rebuilding the app.
+A JSON-driven UI engine for **Expo SDK 56+** that renders native interfaces at runtime.
 
 !!! note
-    This package is designed specifically for **Expo React Native projects only**, and requires **Expo SDK version 52 or higher**.
+    Requires **Expo SDK 56 or higher** and the React Native **New Architecture**.
 
-## Why MEDHIRA?
+## Architecture
 
-In today's mobile app landscape, many applications—especially those powered by chatbots or backend-driven platforms—require the flexibility to render UIs dynamically from a backend source. **MEDHIRA JSON UI Engine** enables exactly that:
+```mermaid
+flowchart TB
+  subgraph Input
+    J[Static JSON]
+    F[Sync / Async function]
+    O[Observable]
+  end
+  JSONUI[JSONUI]
+  REG[Component registry]
+  RN[Expo components]
+  J --> JSONUI
+  F --> JSONUI
+  O --> JSONUI
+  REG --> JSONUI
+  JSONUI --> RN
+```
 
-- **Backend-Driven UIs** - Perfect for chatbot-driven layouts and CMS integrations
-- **Runtime Rendering** - Render components via JSON without code changes or app rebuilds
-- **Performance Optimized** - Built with performance in mind using style caching
-- **Flexible & Extensible** - Component registry and custom type support
+## Key features
 
-## Key Features
+- :material-render: Render UI from JSON
+- :material-puzzle: Reusable components via `defineUseComponent`
+- :material-update: Static, function, Promise, and observable sources
+- :material-eye: Conditional visibility with `showIf` and `context`
+- :material-cog: Style caching integration
+- :material-language-typescript: TypeScript support
 
-- :material-render: **Render UI directly from JSON**
-- :material-puzzle: **Reusable component registry** via `useComponent`
-- :material-update: **Runtime support** for static JSON, functions, and RxJS-like observables
-- :material-react: **Built-in support** for 25+ React Native/Expo components
-- :material-eye-show: **Conditional visibility** with `showIf`
-- :material-cog: **Style optimization** with caching
-- :material-language-typescript: **Full TypeScript support**
-
-## Quick Example
+## Quick example
 
 ```tsx
 import { JSONUI } from 'medhira-rn-expo-json-ui-engine';
@@ -46,9 +49,7 @@ import { JSONUI } from 'medhira-rn-expo-json-ui-engine';
 const json = {
   type: 'Text',
   value: 'Hello MEDHIRA!',
-  props: {
-    style: { fontSize: 24 }
-  }
+  props: { style: { fontSize: 24 } },
 };
 
 export default function App() {
@@ -56,12 +57,9 @@ export default function App() {
 }
 ```
 
-## Sponsor & Support
+## Support
 
-To keep this library maintained and up-to-date, please consider sponsoring it on GitHub.
+- Email: **hello.medhira@gmail.com**
+- GitHub Issues: [medhira-rn-expo-json-ui-engine](https://github.com/HELLOMEDHIRA/medhira-rn-expo-json-ui-engine/issues)
 
-Or, if you're looking for private support or help in customizing the experience, reach out to us at **hello.medhira@gmail.com**
-
----
-
-**MEDHIRA** - Engineering Intelligence Across Everything
+**MEDHIRA** — Engineering Intelligence Across Everything

@@ -26,22 +26,27 @@ import Slider from '@react-native-community/slider';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import LottieView from 'lottie-react-native';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import { getComponentEntry, resolvePlaceholders } from './custom';
 import { BlurView } from 'expo-blur';
 import { CameraView } from 'expo-camera';
 import Carousel from 'react-native-reanimated-carousel';
 import { Picker } from '@react-native-picker/picker';
 import type { PickerItemProps } from '@react-native-picker/picker';
+import PagerView from 'react-native-pager-view';
+import { getComponentEntry, resolvePlaceholders } from './custom';
+import { evaluateShowIf } from './showIf';
+import { getComponentKey, normalizeListData } from './utils';
 import { JSONUIEnums } from './types';
 import type { UIComponent, UseComponent } from './types';
 
 const UseComponentWrapper = ({ ref, props, properties }: UseComponent) => {
   const entry = getComponentEntry(ref);
-  if (!entry) return null;
 
   const resolvedComponent = useMemo(() => {
+    if (!entry) {
+      return null;
+    }
     const mergedProps = { ...entry.defaultProps, ...props };
-    const json = resolvePlaceholders(entry.json, mergedProps);
+    const json = resolvePlaceholders(entry.json, mergedProps) as UIComponent;
 
     if (json.type === JSONUIEnums.ContainerTypes.ViewContainer) {
       return {
@@ -52,31 +57,52 @@ const UseComponentWrapper = ({ ref, props, properties }: UseComponent) => {
     return json;
   }, [entry, props, properties]);
 
+  if (!resolvedComponent) {
+    return null;
+  }
+
   return <>{renderUIComponent(resolvedComponent)}</>;
 };
 
 const ViewContainerWrappers = {
-  View: View,
-  SafeAreaView: SafeAreaView,
-  KeyboardAvoidingView: KeyboardAvoidingView,
-  Pressable: Pressable,
-  TouchableHighlight: TouchableHighlight,
-  TouchableOpacity: TouchableOpacity,
-  TouchableWithoutFeedback: TouchableWithoutFeedback,
-  BlurView: BlurView,
-  CameraView: CameraView,
+  View,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Pressable,
+  TouchableHighlight,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  BlurView,
+  CameraView,
 };
 
-const recursiveRenderUIComponent = (component: any) => {
+const recursiveRenderUIComponent = (component?: UIComponent) => {
   return component ? () => renderUIComponent(component) : undefined;
 };
 
-const cacheSingleStyle = (style: any) => {
-  if (!style) return {};
+const cacheSingleStyle = (style: unknown) => {
+  if (!style) {
+    return {};
+  }
   return getCachedStyle(style);
 };
 
-const renderFlashList = (props: any, components: any) => {
+const renderChildList = (
+  children: UIComponent[] | undefined,
+  properties?: UIComponent[]
+) => {
+  const list = children ?? properties ?? [];
+  return list.map((child, idx) => (
+    <Fragment key={getComponentKey(child, idx)}>
+      {renderUIComponent(child)}
+    </Fragment>
+  ));
+};
+
+const renderFlashList = (
+  props: Record<string, unknown>,
+  components?: ListComponents
+) => {
   const {
     headerComponent,
     footerComponent,
@@ -84,10 +110,14 @@ const renderFlashList = (props: any, components: any) => {
     itemSeparatorComponent,
     cellRendererComponent,
     stickyHeaderComponent,
-  } = components || {};
+  } = components ?? {};
+
+  const data = normalizeListData(props.data as unknown[] | undefined);
+  const listProps = { ...props, data };
+
   return (
     <FlashList
-      {...props}
+      {...listProps}
       ListHeaderComponent={recursiveRenderUIComponent(headerComponent)}
       ListFooterComponent={recursiveRenderUIComponent(footerComponent)}
       ListEmptyComponent={recursiveRenderUIComponent(emptyComponent)}
@@ -101,7 +131,21 @@ const renderFlashList = (props: any, components: any) => {
   );
 };
 
-const renderSectionList = (props: any, components: any) => {
+type ListComponents = {
+  headerComponent?: UIComponent;
+  footerComponent?: UIComponent;
+  emptyComponent?: UIComponent;
+  itemSeparatorComponent?: UIComponent;
+  cellRendererComponent?: UIComponent;
+  stickyHeaderComponent?: UIComponent;
+  sectionHeaderComponent?: UIComponent;
+  sectionSeparatorComponent?: UIComponent;
+};
+
+const renderSectionList = (
+  props: Record<string, unknown>,
+  components?: ListComponents
+) => {
   const {
     headerComponent,
     footerComponent,
@@ -110,13 +154,21 @@ const renderSectionList = (props: any, components: any) => {
     sectionHeaderComponent,
     sectionSeparatorComponent,
     cellRendererComponent,
-  } = components;
+  } = components ?? {};
+
+  const SectionListComponent = SectionList as unknown as React.ComponentType<
+    Record<string, unknown>
+  >;
 
   return (
-    <SectionList
+    <SectionListComponent
       {...props}
-      renderItem={({ item }) => renderUIComponent(item)}
-      renderSectionHeader={renderUIComponent(sectionHeaderComponent)}
+      renderItem={({ item }: { item: UIComponent }) => renderUIComponent(item)}
+      renderSectionHeader={
+        sectionHeaderComponent
+          ? () => renderUIComponent(sectionHeaderComponent)
+          : undefined
+      }
       ListHeaderComponent={recursiveRenderUIComponent(headerComponent)}
       ListFooterComponent={recursiveRenderUIComponent(footerComponent)}
       ListEmptyComponent={recursiveRenderUIComponent(emptyComponent)}
@@ -131,156 +183,258 @@ const renderSectionList = (props: any, components: any) => {
   );
 };
 
-const renderUIComponent = (item: any) => {
+const renderPagerView = (item: {
+  props?: Record<string, unknown>;
+  pages?: UIComponent[];
+  children?: UIComponent[];
+}) => {
+  const pages = item.pages ?? item.children ?? [];
+  return (
+    <PagerView {...(item.props as object)}>
+      {pages.map((page: UIComponent, idx: number) => (
+        <View key={getComponentKey(page, idx)} style={{ flex: 1 }}>
+          {renderUIComponent(page)}
+        </View>
+      ))}
+    </PagerView>
+  );
+};
+
+// JSON nodes are dynamic at runtime; UIComponent union is validated at boundaries.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const renderUIComponent = (item: any): React.ReactElement | null => {
+  if (!item) {
+    return null;
+  }
+
   const { ContainerTypes, LeafTypes, ViewWrapperTypes, CustomTypes } =
     JSONUIEnums;
   const {
-    // Common
     type,
     showIf,
-    props,
-
-    // TextComponent
+    props: componentProps,
     value,
-
-    // ViewContainerComponent
     wrapperComponent,
-
-    // ListContainerComponent, ViewListContainerComponent
     components,
-
-    // ViewListContainerComponent
     listProps,
+    properties,
+    children,
+    maskElement,
+    items,
   } = item;
 
-  if (showIf && typeof showIf === 'function' && !showIf(item)) return null;
-  if (showIf === false) return null;
+  if (!evaluateShowIf(showIf, item as UIComponent)) {
+    return null;
+  }
 
   switch (type) {
     case LeafTypes.Button:
-      return <Button {...props} />;
+      return <Button {...componentProps} />;
     case LeafTypes.Text:
-      return <Text style={cacheSingleStyle(props?.style)}>{value}</Text>;
+      return (
+        <Text style={cacheSingleStyle(componentProps?.style)}>{value}</Text>
+      );
     case LeafTypes.Image:
-      return <Image {...props} style={cacheSingleStyle(props?.style)} />;
+      return (
+        <Image
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        />
+      );
     case LeafTypes.ImageBackground:
       return (
         <ImageBackground
-          {...props}
-          style={cacheSingleStyle(props?.style)}
-          imageStyle={cacheSingleStyle(props?.style)}
-        />
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+          imageStyle={cacheSingleStyle(
+            (componentProps as { imageStyle?: unknown })?.imageStyle ??
+              componentProps?.style
+          )}
+        >
+          {renderChildList(children, properties)}
+        </ImageBackground>
       );
     case LeafTypes.TextInput:
-      return <TextInput {...props} style={cacheSingleStyle(props?.style)} />;
+      return (
+        <TextInput
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        />
+      );
     case LeafTypes.SectionList:
-      return renderSectionList(props, components);
+      return renderSectionList(
+        (componentProps ?? {}) as Record<string, unknown>,
+        components
+      );
     case LeafTypes.Checkbox:
-      return <Checkbox {...props} style={cacheSingleStyle(props?.style)} />;
+      return (
+        <Checkbox
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        />
+      );
     case LeafTypes.LinearGradient:
       return (
-        <LinearGradient {...props} style={cacheSingleStyle(props?.style)}>
-          {(item.children || []).map((child: UIComponent, idx: number) => (
-            <Fragment key={idx}>{renderUIComponent(child)}</Fragment>
-          ))}
+        <LinearGradient
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        >
+          {renderChildList(children)}
         </LinearGradient>
       );
     case LeafTypes.GLView:
-      return <GLView {...props} style={cacheSingleStyle(props?.style)} />;
+      return (
+        <GLView
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        />
+      );
     case LeafTypes.LivePhotoView:
       return (
-        <LivePhotoView {...props} style={cacheSingleStyle(props?.style)} />
+        <LivePhotoView
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        />
       );
     case LeafTypes.StatusBar:
-      return <StatusBar {...props} style={cacheSingleStyle(props?.style)} />;
+      return <StatusBar {...componentProps} />;
     case LeafTypes.VideoView:
-      return <VideoView {...props} style={cacheSingleStyle(props?.style)} />;
-    case LeafTypes.DateTimePicker:
       return (
-        <DateTimePicker {...props} style={cacheSingleStyle(props?.style)} />
+        <VideoView
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        />
       );
+    case LeafTypes.DateTimePicker:
+      return <DateTimePicker {...componentProps} />;
     case LeafTypes.Slider:
-      return <Slider {...props} style={cacheSingleStyle(props?.style)} />;
-    case LeafTypes.MaskedView:
-      const maskElement = renderUIComponent(item.maskElement);
-      if (!maskElement) {
+      return (
+        <Slider
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        />
+      );
+    case LeafTypes.MaskedView: {
+      const mask = renderUIComponent(maskElement);
+      if (!mask) {
         throw new Error('MaskedView requires a valid maskElement.');
       }
       return (
-        <MaskedView maskElement={maskElement}>
-          {(item.children || []).map((child: UIComponent, idx: number) => (
-            <Fragment key={idx}>{renderUIComponent(child)}</Fragment>
-          ))}
-        </MaskedView>
+        <MaskedView maskElement={mask}>{renderChildList(children)}</MaskedView>
       );
+    }
     case LeafTypes.SegmentedControl:
       return (
         <SegmentedControl
-          {...props}
-          style={cacheSingleStyle(props?.style)}
-          tabStyle={cacheSingleStyle(props?.tabStyle)}
-          fontStyle={cacheSingleStyle(props?.fontStyle)}
-          sliderStyle={cacheSingleStyle(props?.sliderStyle)}
-          activeFontStyle={cacheSingleStyle(props?.activeFontStyle)}
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+          tabStyle={cacheSingleStyle(
+            (componentProps as { tabStyle?: unknown })?.tabStyle
+          )}
+          fontStyle={cacheSingleStyle(
+            (componentProps as { fontStyle?: unknown })?.fontStyle
+          )}
+          sliderStyle={cacheSingleStyle(
+            (componentProps as { sliderStyle?: unknown })?.sliderStyle
+          )}
+          activeFontStyle={cacheSingleStyle(
+            (componentProps as { activeFontStyle?: unknown })?.activeFontStyle
+          )}
         />
       );
     case LeafTypes.Picker:
       return (
         <Picker
-          {...props}
-          style={cacheSingleStyle(props?.style)}
-          itemStyle={cacheSingleStyle(props?.itemStyle)}
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+          itemStyle={cacheSingleStyle(
+            (componentProps as { itemStyle?: unknown })?.itemStyle
+          )}
         >
-          {item.items.map((child: PickerItemProps, idx: number) => (
-            <Picker.Item {...child} key={idx} />
+          {(items ?? []).map((child: PickerItemProps, idx: number) => (
+            <Picker.Item {...child} key={child.value?.toString() ?? idx} />
           ))}
         </Picker>
       );
     case LeafTypes.LottieView:
-      return <LottieView {...props} style={cacheSingleStyle(props?.style)} />;
-    case LeafTypes.Carousel:
+      return (
+        <LottieView
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        />
+      );
+    case LeafTypes.Carousel: {
+      const carouselData =
+        (componentProps as { data?: UIComponent[] })?.data ?? children ?? [];
+      const carouselProps = {
+        ...((componentProps ?? {}) as Record<string, unknown>),
+      };
+      delete carouselProps.data;
       return (
         <Carousel
-          {...props}
-          style={cacheSingleStyle(props?.style)}
-          containerStyle={cacheSingleStyle(props?.containerStyle)}
-          renderItem={({ item: child, index }) => (
-            <Fragment key={index}>{renderUIComponent(child)}</Fragment>
+          {...(carouselProps as object)}
+          data={carouselData}
+          width={(carouselProps.width as number) ?? 300}
+          style={cacheSingleStyle(carouselProps?.style)}
+          containerStyle={cacheSingleStyle(
+            (carouselProps as { containerStyle?: unknown }).containerStyle
+          )}
+          renderItem={({
+            item: child,
+            index,
+          }: {
+            item: UIComponent;
+            index: number;
+          }) => (
+            <Fragment key={getComponentKey(child, index)}>
+              {renderUIComponent(child)}
+            </Fragment>
           )}
         />
       );
-
+    }
+    case LeafTypes.PagerView:
+      return renderPagerView(item);
     case ContainerTypes.ViewContainer: {
-      const wrapperKey = (wrapperComponent ||
+      const wrapperKey = (wrapperComponent ??
         ViewWrapperTypes.View) as keyof typeof ViewContainerWrappers;
-      const Wrapper = ViewContainerWrappers[
-        wrapperKey
-      ] as React.ComponentType<any>;
+      const Wrapper = ViewContainerWrappers[wrapperKey] as React.ComponentType<
+        Record<string, unknown>
+      >;
       return (
-        <Wrapper {...props} style={cacheSingleStyle(props?.style)}>
-          {item.properties.map((child: UIComponent, idx: number) => (
-            <Fragment key={idx}>{renderUIComponent(child)}</Fragment>
-          ))}
+        <Wrapper
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        >
+          {renderChildList(undefined, properties)}
         </Wrapper>
       );
     }
     case ContainerTypes.ListContainer:
-      return renderFlashList(props, components);
+      return renderFlashList(
+        (componentProps ?? {}) as Record<string, unknown>,
+        components
+      );
     case ContainerTypes.ViewListContainer: {
-      const wrapperKey = (wrapperComponent ||
+      const wrapperKey = (wrapperComponent ??
         ViewWrapperTypes.View) as keyof typeof ViewContainerWrappers;
-      const Wrapper = ViewContainerWrappers[
-        wrapperKey
-      ] as React.ComponentType<any>;
+      const Wrapper = ViewContainerWrappers[wrapperKey] as React.ComponentType<
+        Record<string, unknown>
+      >;
       return (
-        <Wrapper {...props} style={cacheSingleStyle(props?.style)}>
-          {renderFlashList(listProps, components)}
+        <Wrapper
+          {...componentProps}
+          style={cacheSingleStyle(componentProps?.style)}
+        >
+          {renderFlashList(
+            (listProps ?? {}) as Record<string, unknown>,
+            components
+          )}
         </Wrapper>
       );
     }
     case CustomTypes.useComponent:
-      return <UseComponentWrapper {...item} />;
-
+      return <UseComponentWrapper {...(item as UseComponent)} />;
     default:
       console.warn('Unknown UI component type', type);
       return null;

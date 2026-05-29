@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "MEDHIRA JSON UI Example",
+    "slug": "medhira-json-ui-example",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "sdkVersion": "56.0.0",
+    "newArchEnabled": true
+  }
+}

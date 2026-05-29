@@ -7,7 +7,7 @@ site_author: MEDHIRA Team
 repo_url: https://github.com/HELLOMEDHIRA/medhira-rn-expo-json-ui-engine
 repo_name: HELLOMEDHIRA/medhira-rn-expo-json-ui-engine
 
-copyright: "Copyright &copy; 2024 MEDHIRA - Engineering Intelligence Across Everything"
+copyright: "Copyright &copy; 2024-2026 MEDHIRA - Engineering Intelligence Across Everything"
 
 theme:
   name: material
@@ -43,7 +43,14 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
 
 nav:
   - Home: index.md
@@ -73,11 +80,7 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/HELLOMEDHIRA
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/medhira
-    - icon: fontawesome/brands/linkedin
-      link: https://linkedin.com/in/smuniharish
     - icon: fontawesome/brands/npm
       link: https://www.npmjs.com/package/medhira-rn-expo-json-ui-engine
-  version: 0.0.1
-  release: 0.0.1
+  version: 0.1.0
+  release: 0.1.0

@@ -1,15 +1,11 @@
 # Quick Start
 
-Get started with MEDHIRA JSON UI Engine in under 5 minutes.
-
-## Your First JSON UI
-
-Create a simple UI component using JSON:
+## First screen
 
 ```tsx
 import { JSONUI } from 'medhira-rn-expo-json-ui-engine';
 
-const simpleUI = {
+const ui = {
   type: 'ViewContainer',
   wrapperComponent: 'View',
   props: { style: { padding: 20 } },
@@ -17,71 +13,41 @@ const simpleUI = {
     {
       type: 'Text',
       value: 'Hello, MEDHIRA!',
-      props: { style: { fontSize: 24, fontWeight: 'bold' } }
-    }
-  ]
+      props: { style: { fontSize: 24, fontWeight: 'bold' } },
+    },
+  ],
 };
 
 export default function App() {
-  return <JSONUI json={simpleUI} />;
+  return <JSONUI json={ui} />;
 }
 ```
 
-## Rendering Multiple Components
+## Flow
 
-Build more complex UIs with nested components:
-
-```tsx
-const loginForm = {
-  type: 'ViewContainer',
-  wrapperComponent: 'View',
-  props: { style: { padding: 20 } },
-  properties: [
-    {
-      type: 'Text',
-      value: 'Welcome Back',
-      props: { style: { fontSize: 28, fontWeight: 'bold', marginBottom: 20 } }
-    },
-    {
-      type: 'TextInput',
-      props: {
-        placeholder: 'Email',
-        style: { borderWidth: 1, padding: 10, marginBottom: 10 }
-      }
-    },
-    {
-      type: 'TextInput',
-      props: {
-        placeholder: 'Password',
-        secureTextEntry: true,
-        style: { borderWidth: 1, padding: 10, marginBottom: 20 }
-      }
-    },
-    {
-      type: 'Button',
-      props: {
-        title: 'Login',
-        onPress: () => console.log('Login pressed')
-      }
-    }
-  ]
-};
+```mermaid
+sequenceDiagram
+  participant App
+  participant JSONUI
+  participant UI as Native UI
+  App->>JSONUI: json / jsonSource
+  JSONUI->>UI: render tree
 ```
 
-## Using Dynamic Sources
-
-Load JSON from a function or observable:
+## Dynamic sources
 
 ```tsx
-// Function-based source
-<JSONUI jsonSource={() => fetchMyJson()} />
+// Sync
+<JSONUI jsonSource={() => loadConfig()} />
 
-// Observable source (RxJS-like)
+// Async (Promise)
+<JSONUI jsonSource={async () => fetch('/api/ui').then((r) => r.json())} />
+
+// Observable (RxJS-like)
 <JSONUI jsonSource={myObservable$} />
 ```
 
-## Next Steps
+## Next steps
 
-- [JSON UI Basics](../core-concepts/json-ui-basics.md) - Learn the core concepts
-- [Component Registry](../core-concepts/component-registry.md) - Create reusable components
-- [Advanced Examples](../examples/advanced-examples.md) - Complex use cases
+- [JSON UI Basics](../core-concepts/json-ui-basics.md)
+- [Component Registry](../core-concepts/component-registry.md)

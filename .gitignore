@@ -140,3 +140,8 @@ vite.config.ts.timestamp-*
 
 android/
 ios/
+site/
+_readthedocs/
+.lib/
+*.tgz
+coverage/

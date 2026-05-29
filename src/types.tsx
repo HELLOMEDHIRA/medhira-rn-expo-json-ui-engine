@@ -14,12 +14,12 @@ import type { SegmentedControlProps } from '@react-native-segmented-control/segm
 import type { PickerItemProps, PickerProps } from '@react-native-picker/picker';
 import type { LottieViewProps } from 'lottie-react-native';
 import type { TCarouselProps } from 'react-native-reanimated-carousel';
+import type { PagerViewProps } from 'react-native-pager-view';
 
 import type { ImageBackgroundProps, ImageProps } from 'expo-image';
 import type {
   TextInputProps,
   TextProps,
-  TouchableOpacityProps,
   ViewProps,
   PressableProps,
   TouchableHighlightProps,
@@ -30,8 +30,10 @@ import type {
   SectionListData,
 } from 'react-native';
 import type { SafeAreaViewProps } from 'react-native-safe-area-context';
+import type { JSONUIContextValue } from './context';
 
-// main types
+export type { JSONUIContextValue };
+
 enum CustomTypes {
   useComponent = 'useComponent',
 }
@@ -60,11 +62,11 @@ enum LeafTypes {
   Picker = 'Picker',
   LottieView = 'LottieView',
   Carousel = 'Carousel',
+  PagerView = 'PagerView',
 }
 
 export { ContainerTypes, LeafTypes };
 
-// SubTypes
 enum ViewWrapperTypes {
   View = 'View',
   SafeAreaView = 'SafeAreaView',
@@ -102,12 +104,21 @@ type UIComponentTypes =
   | LeafTypes.SegmentedControl
   | LeafTypes.Picker
   | LeafTypes.LottieView
-  | LeafTypes.Carousel;
-type UITypes = UIContainerTypes | UIComponentTypes;
+  | LeafTypes.Carousel
+  | LeafTypes.PagerView;
+
+type UITypes = UIContainerTypes | UIComponentTypes | CustomTypes.useComponent;
+
+type ShowIfFn = (
+  context: JSONUIContextValue & { component?: unknown },
+  component?: unknown
+) => boolean;
 
 interface BaseUIComponent {
   type: UITypes;
-  showIf?: boolean | ((context: any) => boolean);
+  key?: string;
+  id?: string;
+  showIf?: boolean | ShowIfFn;
 }
 
 interface ButtonComponent extends BaseUIComponent {
@@ -128,11 +139,13 @@ interface ImageComponent extends BaseUIComponent {
 interface ImageBackgroundComponent extends BaseUIComponent {
   type: LeafTypes.ImageBackground;
   props: ImageBackgroundProps;
+  properties?: UIComponent[];
+  children?: UIComponent[];
 }
 
 interface TextInputComponent extends BaseUIComponent {
   type: LeafTypes.TextInput;
-  props: TextInputProps;
+  props?: TextInputProps;
 }
 
 type UISectionListProps = Omit<
@@ -147,67 +160,80 @@ type UISectionListProps = Omit<
   | 'CellRendererComponent'
   | 'stickySectionHeadersEnabled'
 >;
+
 interface SectionListComponent extends BaseUIComponent {
   type: LeafTypes.SectionList;
-  props: UISectionListProps;
+  props?: UISectionListProps;
+  components?: ListSlotComponents & {
+    sectionHeaderComponent?: UIComponent;
+    sectionSeparatorComponent?: UIComponent;
+  };
 }
+
 interface CheckboxComponent extends BaseUIComponent {
   type: LeafTypes.Checkbox;
-  props: CheckboxProps;
+  props?: CheckboxProps;
 }
 interface LinearGradientComponent extends BaseUIComponent {
   type: LeafTypes.LinearGradient;
-  props: LinearGradientProps;
-  children: UIComponent[];
+  props?: LinearGradientProps;
+  children?: UIComponent[];
 }
 interface GLViewComponent extends BaseUIComponent {
   type: LeafTypes.GLView;
-  props: GLViewProps;
+  props?: GLViewProps;
 }
 interface LivePhotoViewComponent extends BaseUIComponent {
   type: LeafTypes.LivePhotoView;
-  props: LivePhotoViewProps;
+  props?: LivePhotoViewProps;
 }
 interface StatusBarComponent extends BaseUIComponent {
   type: LeafTypes.StatusBar;
-  props: StatusBarProps;
+  props?: StatusBarProps;
 }
 interface VideoViewComponent extends BaseUIComponent {
   type: LeafTypes.VideoView;
-  props: VideoViewProps;
+  props?: VideoViewProps;
 }
-// Third Party Libraries
 interface DateTimePickerComponent extends BaseUIComponent {
   type: LeafTypes.DateTimePicker;
-  props: React.Component<ReactNativeModalDateTimePickerProps, any>;
+  props?: ReactNativeModalDateTimePickerProps;
 }
 interface SliderComponent extends BaseUIComponent {
   type: LeafTypes.Slider;
-  props: SliderProps;
+  props?: SliderProps;
 }
 interface MaskedViewComponent extends BaseUIComponent {
   type: LeafTypes.MaskedView;
-  props: Omit<MaskedViewProps, 'maskElement'>;
-  maskElement: ViewContainerComponent | ViewListContainerComponent;
-  children: UIComponent[];
+  props?: Omit<MaskedViewProps, 'maskElement'>;
+  maskElement: UIComponent;
+  children?: UIComponent[];
 }
 interface SegmentedControlComponent extends BaseUIComponent {
   type: LeafTypes.SegmentedControl;
-  props: SegmentedControlProps;
+  props?: SegmentedControlProps;
 }
 interface PickerComponent extends BaseUIComponent {
   type: LeafTypes.Picker;
-  props: PickerProps;
-  items: PickerItemProps;
+  props?: PickerProps;
+  items: PickerItemProps[];
 }
 interface LottieViewComponent extends BaseUIComponent {
   type: LeafTypes.LottieView;
-  props: LottieViewProps;
+  props?: LottieViewProps;
 }
 interface CarouselComponent extends BaseUIComponent {
   type: LeafTypes.Carousel;
-  props: Omit<TCarouselProps<UIComponent>, 'renderItem'>;
-  children: UIComponent[];
+  props?: Omit<TCarouselProps<UIComponent>, 'renderItem' | 'data'> & {
+    data?: UIComponent[];
+  };
+  children?: UIComponent[];
+}
+interface PagerViewComponent extends BaseUIComponent {
+  type: LeafTypes.PagerView;
+  props?: PagerViewProps;
+  pages?: UIComponent[];
+  children?: UIComponent[];
 }
 
 type WrapperComponentPropsMap = {
@@ -216,7 +242,7 @@ type WrapperComponentPropsMap = {
   [ViewWrapperTypes.KeyboardAvoidingView]: KeyboardAvoidingViewProps;
   [ViewWrapperTypes.Pressable]: PressableProps;
   [ViewWrapperTypes.TouchableHighlight]: TouchableHighlightProps;
-  [ViewWrapperTypes.TouchableOpacity]: TouchableOpacityProps;
+  [ViewWrapperTypes.TouchableOpacity]: ViewProps;
   [ViewWrapperTypes.TouchableWithoutFeedback]: TouchableWithoutFeedbackProps;
   [ViewWrapperTypes.BlurView]: BlurViewProps;
   [ViewWrapperTypes.CameraView]: CameraViewProps;
@@ -244,10 +270,19 @@ type UIFlashListProps = Omit<
   | 'ListHeaderComponent'
   | 'ListFooterComponent'
   | 'ListEmptyComponent'
-  | 'ItemSeperatorComponent'
+  | 'ItemSeparatorComponent'
   | 'CellRendererComponent'
   | 'StickyHeaderComponent'
 >;
+
+type ListSlotComponents = {
+  headerComponent?: UIComponent;
+  footerComponent?: UIComponent;
+  emptyComponent?: UIComponent;
+  itemSeparatorComponent?: UIComponent;
+  cellRendererComponent?: UIComponent;
+  stickyHeaderComponent?: UIComponent;
+};
 
 type ViewContainerComponent = ViewContainerWrapperComponent & {
   type: ContainerTypes.ViewContainer;
@@ -256,28 +291,16 @@ type ViewContainerComponent = ViewContainerWrapperComponent & {
 interface ListContainerComponent extends BaseUIComponent {
   type: ContainerTypes.ListContainer;
   props?: UIFlashListProps;
-  components?: {
-    headerComponent?: UIComponent;
-    footerComponent?: UIComponent;
-    emptyComponent?: UIComponent;
-    itemSeparatorComponent?: UIComponent;
-    cellRendererComponent?: UIComponent;
-    stickyHeaderComponent?: UIComponent;
-  };
+  components?: ListSlotComponents;
 }
 interface ViewListContainerComponent extends BaseUIComponent {
   type: ContainerTypes.ViewListContainer;
   listProps: UIFlashListProps;
   props?: ViewProps;
-  components?: {
-    headerComponent?: UIComponent;
-    footerComponent?: UIComponent;
-    emptyComponent?: UIComponent;
-    itemSeparatorComponent?: UIComponent;
-    cellRendererComponent?: UIComponent;
-    stickyHeaderComponent?: UIComponent;
-  };
+  wrapperComponent?: ViewWrapperTypes;
+  components?: ListSlotComponents;
 }
+
 export type {
   ViewContainerComponent,
   ListContainerComponent,
@@ -286,13 +309,14 @@ export type {
 
 interface UseComponent<
   TRef extends string = string,
-  TProps extends object = Record<string, any>,
+  TProps extends object = Record<string, unknown>,
 > {
   type: CustomTypes.useComponent;
   ref: TRef;
   props?: TProps;
   properties?: UIComponent[];
 }
+
 export type { UseComponent };
 
 type UIComponent =
@@ -315,12 +339,25 @@ type UIComponent =
   | PickerComponent
   | LottieViewComponent
   | CarouselComponent
+  | PagerViewComponent
   | ViewContainerComponent
   | ListContainerComponent
   | ViewListContainerComponent
   | UseComponent;
 
-export type { UIComponent };
+export type { UIComponent, ShowIfFn };
+
+type JSONSource =
+  | UIComponent
+  | UIComponent[]
+  | (() => UIComponent | UIComponent[] | Promise<UIComponent | UIComponent[]>)
+  | {
+      subscribe: (cb: (val: UIComponent | UIComponent[]) => void) => {
+        unsubscribe: () => void;
+      };
+    };
+
+export type { JSONSource };
 
 const JSONUIEnums = {
   ContainerTypes,
@@ -329,4 +366,4 @@ const JSONUIEnums = {
   CustomTypes,
 };
 
-export { JSONUIEnums };
+export { JSONUIEnums, CustomTypes };

@@ -1,15 +1,20 @@
-import type { UIComponent } from './types';
+import { type ReactNode } from 'react';
+import type { JSONSource, UIComponent } from './types';
 import { JSONUIEnums } from './types';
-type JSONSource = UIComponent | UIComponent[] | (() => UIComponent | UIComponent[]) | {
-    subscribe: (cb: (val: any) => void) => {
-        unsubscribe: () => void;
-    };
-};
-interface JSONUIProps {
+import { type JSONUIContextValue } from './context';
+export { JSONUIErrorBoundary } from './JSONUIErrorBoundary';
+export { defineUseComponent, registerJSONComponent, clearComponentRegistry, } from './custom';
+export { JSONUIContext, useJSONUIContext } from './context';
+type JSONUIProps = {
     json?: UIComponent | UIComponent[];
     jsonSource?: JSONSource;
-}
-declare const JSONUI: ({ json, jsonSource }: JSONUIProps) => import("react").JSX.Element;
+    context?: JSONUIContextValue;
+    loadingComponent?: ReactNode;
+    errorFallback?: ReactNode;
+    onRenderError?: (error: Error) => void;
+};
+declare const JSONUI: (props: JSONUIProps) => import("react").JSX.Element;
 export { JSONUI, JSONUIEnums };
-export type { UIComponent };
+export type { UIComponent, JSONSource, ShowIfFn } from './types';
+export type { JSONUIContextValue } from './context';
 //# sourceMappingURL=index.d.ts.map

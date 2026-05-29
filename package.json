@@ -1,6 +1,6 @@
 {
   "name": "medhira-rn-expo-json-ui-engine",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A JSON-driven UI engine for React Native and Expo that enables dynamic, runtime-rendered interfaces without rebuilding the app. Powered by MEDHIRA - Engineering Intelligence Across Everything.",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
@@ -9,35 +9,26 @@
   "logo": "https://raw.githubusercontent.com/HELLOMEDHIRA/medhira/main/assets/medhira-logo.png",
   "files": [
     "lib",
-    "android",
-    "ios",
-    "cpp",
-    "*.podspec",
-    "react-native.config.js",
-    "!ios/build",
-    "!android/build",
-    "!android/gradle",
-    "!android/gradlew",
-    "!android/gradlew.bat",
-    "!android/local.properties",
-    "!**/__tests__",
-    "!**/__fixtures__",
-    "!**/__mocks__",
-    "!**/.*"
+    "LICENSE",
+    "NOTICE",
+    "README.md"
   ],
   "scripts": {
-    "example": "yarn workspace medhira-rn-expo-json-ui-engine-example",
+    "example": "yarn workspace medhira-rn-expo-json-ui-engine-example start",
     "test": "jest",
     "typecheck": "tsc",
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "clean": "del-cli lib",
-    "prepare": "bob build && npm run postbuild",
+    "build": "bob build && npm run postbuild",
+    "prepare": "npm run build",
     "postbuild": "node minify.js",
-    "release": "release-it"
+    "release": "release-it",
+    "docs:build": "mkdocs build -d site"
   },
   "keywords": [
     "react-native",
     "expo",
+    "expo-sdk-56",
     "json-ui",
     "runtime-ui",
     "dynamic-ui",
@@ -70,63 +61,78 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@lottiefiles/dotlottie-react": "^0.19.0",
+    "@lottiefiles/dotlottie-react": "^0.19.4",
     "@react-native-community/slider": "^5.2.0",
     "@react-native-masked-view/masked-view": "^0.3.2",
     "@react-native-picker/picker": "^2.11.4",
     "@react-native-segmented-control/segmented-control": "^2.5.7",
     "@shopify/flash-list": "^2.3.1",
-    "expo-blur": "^55.0.14",
-    "expo-camera": "^55.0.16",
-    "expo-checkbox": "^55.0.4",
-    "expo-gl": "^55.0.13",
-    "expo-image": "^55.0.9",
-    "expo-linear-gradient": "^55.0.13",
-    "expo-live-photo": "^55.0.13",
-    "expo-status-bar": "^55.0.5",
-    "expo-video": "^55.0.15",
-    "lottie-react-native": "^7.3.6",
+    "expo-blur": "^56.0.3",
+    "expo-camera": "^56.0.7",
+    "expo-checkbox": "^56.0.1",
+    "expo-gl": "^56.0.5",
+    "expo-image": "^56.0.9",
+    "expo-linear-gradient": "^56.0.4",
+    "expo-live-photo": "^56.0.3",
+    "expo-status-bar": "^56.0.4",
+    "expo-video": "^56.1.2",
+    "lottie-react-native": "^7.3.8",
     "medhira-rn-styles-cache": "^0.0.1",
     "react-native-modal-datetime-picker": "^18.0.0",
+    "react-native-pager-view": "^8.0.2",
     "react-native-reanimated-carousel": "^4.0.3",
-    "react-native-safe-area-context": "^5.7.0"
+    "react-native-safe-area-context": "^5.8.0"
   },
   "devDependencies": {
-    "@commitlint/config-conventional": "^20.5.0",
-    "@evilmartians/lefthook": "^2.1.6",
-    "@react-native/eslint-config": "^0.85.2",
-    "@release-it/conventional-changelog": "^10.0.6",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@eslint/js": "^10.0.1",
+    "@evilmartians/lefthook": "^2.1.9",
+    "@release-it/conventional-changelog": "^11.0.0",
     "@types/jest": "^30.0.0",
-    "@types/react": "^19.2.14",
-    "commitlint": "^20.5.0",
+    "@types/react": "^19.2.15",
+    "commitlint": "^21.0.2",
     "del-cli": "^7.0.0",
-    "eslint": "^10.2.1",
+    "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
-    "jest": "^30.3.0",
+    "eslint-plugin-prettier": "^5.5.6",
+    "expo": "^56.0.6",
+    "fast-glob": "^3.3.3",
+    "jest": "^30.4.2",
     "prettier": "^3.8.3",
-    "react": "^19.2.5",
-    "react-native": "0.85.2",
+    "react": "^19.2.6",
+    "react-native": "0.85.3",
     "react-native-builder-bob": "^0.41.0",
-    "release-it": "^20.0.0",
-    "typescript": "^6.0.3"
+    "react-native-gesture-handler": "^3.0.0",
+    "react-native-reanimated": "^4.4.0",
+    "react-native-worklets": "0.9.1",
+    "release-it": "^20.0.1",
+    "terser": "^5.48.0",
+    "ts-jest": "^29.4.11",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.0"
   },
   "peerDependencies": {
-    "expo": ">=53.0.20",
-    "react": "*",
-    "react-native": "*",
-    "react-native-gesture-handler": ">=2.24.0",
-    "react-native-reanimated": ">=3.17.4"
+    "expo": ">=56.0.6",
+    "react": ">=19.2.0",
+    "react-native": ">=0.85.3",
+    "react-native-gesture-handler": ">=3.0.0",
+    "react-native-reanimated": ">=4.4.0",
+    "react-native-worklets": ">=0.9.1"
+  },
+  "peerDependenciesMeta": {
+    "react-native-gesture-handler": {
+      "optional": false
+    },
+    "react-native-reanimated": {
+      "optional": false
+    },
+    "react-native-worklets": {
+      "optional": false
+    }
   },
   "overrides": {
-    "@react-native/eslint-config": {
-      "eslint": "^10.2.1"
-    },
-    "@release-it/conventional-changelog": {
-      "release-it": "^20.0.0"
-    },
     "lottie-react-native": {
-      "@lottiefiles/dotlottie-react": "^0.19.0"
+      "@lottiefiles/dotlottie-react": "^0.19.4"
     }
   },
   "workspaces": [
@@ -134,10 +140,15 @@
   ],
   "packageManager": "yarn@3.6.1",
   "jest": {
-    "preset": "react-native",
+    "preset": "ts-jest",
+    "testEnvironment": "node",
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/lib/"
     ]
   },
   "commitlint": {
@@ -162,30 +173,6 @@
       }
     }
   },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@react-native",
-      "prettier"
-    ],
-    "rules": {
-      "react/react-in-jsx-scope": "off",
-      "prettier/prettier": [
-        "error",
-        {
-          "quoteProps": "consistent",
-          "singleQuote": true,
-          "tabWidth": 2,
-          "trailingComma": "es5",
-          "useTabs": false
-        }
-      ]
-    }
-  },
-  "eslintIgnore": [
-    "node_modules/",
-    "lib/"
-  ],
   "prettier": {
     "quoteProps": "consistent",
     "singleQuote": true,
@@ -197,7 +184,6 @@
     "source": "src",
     "output": "lib",
     "targets": [
-      "codegen",
       [
         "commonjs",
         {
@@ -217,19 +203,6 @@
         }
       ]
     ]
-  },
-  "codegenConfig": {
-    "name": "RNMedhiraRnExpoJsonUiEngine",
-    "type": "all",
-    "jsSrcsDir": "lib",
-    "outputDir": {
-      "ios": "ios/generated",
-      "android": "android/generated"
-    },
-    "android": {
-      "javaPackageName": "com.medhiraexpojsonuiengine"
-    },
-    "includeGeneratedCode": true
   },
   "create-react-native-library": {
     "languages": "js",

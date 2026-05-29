@@ -23,6 +23,13 @@
 
     "useDefineForClassFields": true
   },
-  "include": ["src", "index.js"],
-  "exclude": ["node_modules", "lib", "example", "android", "ios"]
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "lib",
+    "example",
+    "android",
+    "ios",
+    "**/__tests__/**"
+  ]
 }

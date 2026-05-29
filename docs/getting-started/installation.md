@@ -1,58 +1,53 @@
 # Installation
 
-This guide will help you install MEDHIRA JSON UI Engine in your React Native/Expo project.
-
 ## Requirements
 
-- **React Native** 0.81+
-- **Expo SDK** 52+
-- **Node.js** 18+
+| Tool | Version |
+|------|---------|
+| Expo SDK | **56+** |
+| React Native | **0.85+** |
+| Node.js | **20+** |
 
-## Install the Package
+## Install
 
 ```bash
 npm install medhira-rn-expo-json-ui-engine
-# or
-yarn add medhira-rn-expo-json-ui-engine
 ```
 
-## Peer Dependencies
-
-This package requires the following peer dependencies. Make sure they're installed:
+## Peer dependencies
 
 ```bash
-npm install react react-native expo react-native-reanimated react-native-gesture-handler
-# or
-yarn add react react-native expo react-native-reanimated react-native-gesture-handler
+npx expo install expo react react-native react-native-gesture-handler react-native-reanimated react-native-worklets react-native-pager-view
 ```
 
-## Additional Expo Packages
+## Optional Expo modules
 
-Depending on the components you use, you may need additional Expo packages:
+Install modules for the components you use:
 
 ```bash
-npx expo install expo-image expo-camera expo-video expo-blur expo-linear-gradient expo-checkbox expo-status-bar expo-gl expo-live-photo
+npx expo install expo-image@^56.0.9 expo-camera@^56.0.7 expo-video@^56.1.2 expo-blur@^56.0.3 \
+  expo-linear-gradient@^56.0.4 expo-checkbox@^56.0.1 expo-status-bar@^56.0.4 expo-gl@^56.0.5 \
+  expo-live-photo@^56.0.3 react-native-pager-view@^8.0.2
 ```
 
-## Verify Installation
-
-To verify the installation was successful, run:
+## Verify
 
 ```tsx
 import { JSONUI } from 'medhira-rn-expo-json-ui-engine';
 
-// Basic test
-const testJson = {
-  type: 'Text',
-  value: 'MEDHIRA is working!',
-};
-
 export default function App() {
-  return <JSONUI json={testJson} />;
+  return (
+    <JSONUI
+      json={{
+        type: 'Text',
+        value: 'MEDHIRA is working!',
+      }}
+    />
+  );
 }
 ```
 
-## Next Steps
+## Next steps
 
-- [Quick Start](quick-start.md) - Get up and running in 5 minutes
-- [Basic Examples](../examples/basic-examples.md) - See practical examples
+- [Quick Start](quick-start.md)
+- [Basic Examples](../examples/basic-examples.md)

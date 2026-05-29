@@ -1,38 +1,9 @@
 # License
 
-MEDHIRA JSON UI Engine is licensed under the Apache 2.0 License.
+Apache License 2.0 — Copyright 2024-2026 MEDHIRA.
 
-## Apache 2.0 License
+Full text: [LICENSE](https://github.com/HELLOMEDHIRA/medhira-rn-expo-json-ui-engine/blob/main/LICENSE)
 
-Copyright (c) 2024 MEDHIRA
+## Third-party software
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-```
-http://www.apache.org/licenses/LICENSE-2.0
-```
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-## Third-Party Licenses
-
-This package includes dependencies that are licensed under their own terms:
-
-- React Native - MIT License
-- Expo - MIT License
-- @shopify/flash-list - MIT License
-- lottie-react-native - MIT License
-
-## MEDHIRA
-
-**MEDHIRA** - Engineering Intelligence Across Everything
-
-- Website: [https://medhira.readthedocs.io/en/latest/](https://medhira.readthedocs.io/en/latest/)
-- GitHub: [https://github.com/HELLOMEDHIRA](https://github.com/HELLOMEDHIRA)
-- Email: hello.medhira@gmail.com
+This library depends on open source packages including React Native, Expo, FlashList, Lottie, and others. Each dependency is governed by its own license (typically MIT). See your package lockfile and vendor notices for details.

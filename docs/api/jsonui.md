@@ -1,106 +1,42 @@
-# JSONUI Component
+# JSONUI
 
-The main component for rendering JSON-defined UIs.
+Main entry component.
 
 ## Import
 
 ```tsx
-import { JSONUI } from 'medhira-rn-expo-json-ui-engine';
+import { JSONUI, JSONUIErrorBoundary } from 'medhira-rn-expo-json-ui-engine';
 ```
 
 ## Props
 
-### `json`
+| Prop | Type | Description |
+|------|------|-------------|
+| `json` | `UIComponent \| UIComponent[]` | Static tree |
+| `jsonSource` | `JSONSource` | Static, function, Promise, or observable |
+| `context` | `Record<string, unknown>` | Data for `showIf` functions |
+| `loadingComponent` | `ReactNode` | Shown while async `jsonSource` loads |
+| `errorFallback` | `ReactNode` | Shown if rendering throws |
+| `onRenderError` | `(error: Error) => void` | Error callback |
 
-Static JSON component definition.
-
-```tsx
-<JSONUI json={myComponent} />
-```
-
-Type: `UIComponent | UIComponent[]`
-
-### `jsonSource`
-
-Dynamic source for the UI - can be a function or observable.
+## Examples
 
 ```tsx
-// Function
-<JSONUI jsonSource={() => fetchConfig()} />
+<JSONUI json={{ type: 'Text', value: 'Hi' }} />
 
-// Observable
-<JSONUI jsonSource={observable$} />
-
-// Lazy function
-<JSONUI jsonSource={myLazyJson} />
+<JSONUI jsonSource={async () => fetchUi()} context={{ role: 'admin' }} />
 ```
 
-Type: `JSONSource`
-
-```ts
-type JSONSource =
-  | UIComponent
-  | UIComponent[]
-  | (() => UIComponent | UIComponent[])
-  | { subscribe: (cb: (val: any) => void) => { unsubscribe: () => void } };
-```
-
-## Basic Usage
-
-### Static JSON
+## Error boundary
 
 ```tsx
-const myUI = {
-  type: 'Text',
-  value: 'Hello!'
-};
-
-<JSONUI json={myUI} />
+<JSONUIErrorBoundary fallback={<Text>Something went wrong</Text>}>
+  <JSONUI json={ui} />
+</JSONUIErrorBoundary>
 ```
 
-### Array of Components
+`JSONUI` wraps an error boundary by default.
 
-```tsx
-const components = [
-  { type: 'Text', value: 'Item 1' },
-  { type: 'Text', value: 'Item 2' }
-];
-
-<JSONUI json={components} />
-```
-
-### Dynamic Source
-
-```tsx
-<JSONUI jsonSource={() => {
-  // Return component or array
-  return fetch('/api/ui').then(r => r.json());
-}} />
-```
-
-## Observable Pattern
-
-```tsx
-import { BehaviorSubject } from 'rxjs';
-
-const config$ = new BehaviorSubject(defaultConfig);
-
-function App() {
-  // Update will trigger re-render
-  const updateConfig = (newConfig) => {
-    config$.next(newConfig);
-  };
-
-  return <JSONUI jsonSource={config$} />;
-}
-```
-
-## Best Practices
-
-1. **Always provide fallback** - Use default UI when loading
-2. **Handle errors** - Wrap in error boundaries
-3. **Memoize complex JSON** - Use `useMemo` for expensive calculations
-
-## Next Section
+## Next
 
 - [Component Types](./component-types.md)
